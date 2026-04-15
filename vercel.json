@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/discovery",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/scrape",
+      "schedule": "*/5 22-23,0-8 * * *"
+    }
+  ]
+}

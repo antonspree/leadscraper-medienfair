@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SHK Lead Scraper
 
-## Getting Started
+Web-App zum Sammeln und Qualifizieren von SHK-Leads (Sanitär, Heizung, Klima) über öffentliche Verzeichnisse, mit Impressum-Extraktion per Claude Haiku. Stack: **Next.js 14 (App Router)**, **TypeScript**, **Tailwind + shadcn/ui**, **Supabase**, **Vercel Cron**, **Anthropic**.
 
-First, run the development server:
+## Deployment-Checkliste
+
+1. **Supabase**: Projekt anlegen, im SQL-Editor die Datei [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) ausführen (Kern-Tabellen + `discovery_state`).
+2. **GitHub**: Repository anlegen und diesen Code pushen.
+3. **Vercel**: Neues Projekt mit GitHub verbinden, Root-Verzeichnis wählen, **Environment Variables** setzen (siehe `.env.example`).
+4. **Erster Discovery-Lauf**: Nach dem Deploy manuell auslösen (mit Secret):
+
+   ```bash
+   curl -H "Authorization: Bearer <CRON_SECRET>" "https://<dein-projekt>.vercel.app/api/cron/discovery"
+   ```
+
+5. **Cron**: Vercel führt die Jobs gemäß [`vercel.json`](vercel.json) aus — nach einiger Zeit sollten Queue und Leads im Dashboard sichtbar sein.
+
+## Lokale Entwicklung
 
 ```bash
+npm install
+cp .env.example .env.local
+# .env.local mit echten Werten füllen
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- App: `http://localhost:3000`
+- Cron-Routen lokal mit gleichem `Authorization: Bearer`-Header testen.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Umgebungsvariablen
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Beschreibung |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon Key (optional für spätere Client-Nutzung) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service Role — nur Server/Cron, **nie** im Client |
+| `ANTHROPIC_API_KEY` | API-Key für Claude Haiku |
+| `CRON_SECRET` | Zufälliger String; Vercel Cron und manuelle Aufrufe senden `Authorization: Bearer <CRON_SECRET>` |
 
-## Learn More
+## Rechtliches / Verantwortung
 
-To learn more about Next.js, take a look at the following resources:
+Die Nutzung öffentlicher Verzeichnisse kann gegen Nutzungsbedingungen verstoßen. Nutzung auf **eigenes Risiko**; rechtliche Prüfung wird empfohlen. Die App hat **kein Login** — die URL ist nur ein schwacher Schutz; interne Nutzung oder zusätzliche Absicherung empfohlen.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Kostenschätzung (ca.)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Komponente | Kosten/Monat |
+| --- | --- |
+| Vercel (Hobby) | 0 € |
+| Supabase (Free Tier) | 0 € |
+| Anthropic Haiku | ~3–5 € (bei ca. 5.000 Leads) |
+| Discovery (Verzeichnisse) | 0 € |
+| **Gesamt** | **~3–5 €/Monat** |
