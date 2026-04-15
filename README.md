@@ -15,6 +15,22 @@ Web-App zum Sammeln und Qualifizieren von SHK-Leads (Sanitär, Heizung, Klima) �
 
 5. **Cron**: Vercel führt die Jobs gemäß [`vercel.json`](vercel.json) aus — nach einiger Zeit sollten Queue und Leads im Dashboard sichtbar sein.
 
+## Durchsatz erhöhen (mehr Leads pro Zeit)
+
+Standard ist schon erhöht: **Scrape-Batch 15**, Cron **alle 2 Minuten** (aktive Zeitfenster), **Discovery bis zu 2500** neue URLs pro Lauf.
+
+In **Vercel → Environment Variables** optional setzen:
+
+| Variable | Wirkung |
+| --- | --- |
+| `QUALITY_MIN_ISSUES=1` | Lockere Qualifikation (1 Mangel reicht statt 2) — deutlich mehr Kandidaten, weniger „schlechte Website“-Fokus. |
+| `SCRAPE_BATCH_SIZE` | Parallel pro Batch (Standard **15**, max. 30). |
+| `SCRAPE_MAX_RUNTIME_MS` | Laufzeit pro Scrape-Request (Standard **58000**, max. **58000** bei Hobby wegen 60 s Function-Limit). |
+| `DISCOVERY_MAX_URLS` | Max. neue Queue-URLs pro Discovery-Lauf (Standard **2500**, max. 10000). |
+| `RATE_LIMIT_HOST_MS` | Pause pro Host in ms (Standard **200**, min. 50 — kleiner = schneller, höheres Blockier-Risiko). |
+
+**Kosten:** Mehr Batches → mehr Anthropic-Aufrufe und Vercel-Minuten. **Hobby:** Function-Timeout bleibt 60 s — für längere Läufe Vercel Pro und `maxDuration` in den Cron-`route.ts`-Dateien erhöhen.
+
 ## Lokale Entwicklung
 
 ```bash
@@ -35,7 +51,8 @@ npm run dev
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon Key (optional für spätere Client-Nutzung) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service Role — nur Server/Cron, **nie** im Client |
 | `ANTHROPIC_API_KEY` | API-Key für Claude Haiku |
-| `CRON_SECRET` | Zufälliger String; Vercel Cron und manuelle Aufrufe senden `Authorization: Bearer <CRON_SECRET>` |
+| `CRON_SECRET` | Zufälliger String; Vercel Cron und `curl` senden `Authorization: Bearer <CRON_SECRET>` |
+| `ADMIN_PASSWORD` | Passwort für **Einstellungen → Jobs auslösen** (Discovery/Scrape per UI, `POST /api/admin/trigger`) |
 
 ## Rechtliches / Verantwortung
 

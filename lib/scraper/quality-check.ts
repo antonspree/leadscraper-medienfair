@@ -1,3 +1,10 @@
+/** Mindestanzahl erkannte Mängel (1–5). `QUALITY_MIN_ISSUES=1` erhöht die Lead-Schlagzahl. */
+function getMinQualityIssues(): number {
+  const v = parseInt(process.env.QUALITY_MIN_ISSUES ?? "2", 10);
+  if (Number.isNaN(v)) return 2;
+  return Math.max(1, Math.min(5, v));
+}
+
 export interface QualityResult {
   passes: boolean;
   issues: string[];
@@ -70,7 +77,8 @@ export async function checkWebsiteQuality(url: string): Promise<QualityResult> {
       issues.push("veraltetes_cms");
     }
 
-    const passes = issues.length >= 2;
+    const minIssues = getMinQualityIssues();
+    const passes = issues.length >= minIssues;
 
     return {
       passes,

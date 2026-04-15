@@ -186,10 +186,10 @@ export async function discoverUrls(
   if (cityIndex >= STAEDTE.length) cityIndex = 0;
 
   let urlsQueued = 0;
-  const MAX_STEPS = 400;
+  const maxSteps = Math.min(5000, Math.max(800, maxPerRun * 3));
   let steps = 0;
 
-  while (urlsQueued < maxPerRun && steps < MAX_STEPS) {
+  while (urlsQueued < maxPerRun && steps < maxSteps) {
     steps += 1;
     const begriff = SUCHBEGRIFFE[termIndex % SUCHBEGRIFFE.length];
     const stadt = STAEDTE[cityIndex % STAEDTE.length];

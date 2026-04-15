@@ -1,6 +1,10 @@
-const GAP_MS = 200;
+function gapMs(): number {
+  const n = parseInt(process.env.RATE_LIMIT_HOST_MS ?? "200", 10);
+  if (Number.isNaN(n)) return 200;
+  return Math.max(50, Math.min(500, n));
+}
 
-/** 200 ms Pause zwischen Requests zur selben Domain (pro Aufruf/Kontext neu instanziieren). */
+/** Pause zwischen Requests zur selben Domain (Standard 200 ms, `RATE_LIMIT_HOST_MS` 50–500). */
 export function createHostThrottler() {
   const lastByHost = new Map<string, number>();
 
@@ -22,7 +26,7 @@ export function createHostThrottler() {
     }
     const now = Date.now();
     const last = lastByHost.get(hostname) ?? 0;
-    const wait = Math.max(0, GAP_MS - (now - last));
+    const wait = Math.max(0, gapMs() - (now - last));
     if (wait > 0) {
       await new Promise((r) => setTimeout(r, wait));
     }

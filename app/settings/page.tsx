@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AdminTriggers } from "@/components/settings/AdminTriggers";
 
 export default function SettingsPage() {
   return (
@@ -6,9 +7,11 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-2xl font-semibold text-white">Einstellungen</h1>
         <p className="mt-1 text-sm text-zinc-400">
-          Hinweise zur Konfiguration — keine Secrets in der Oberfläche
+          Konfiguration und manuelle Jobs
         </p>
       </div>
+
+      <AdminTriggers />
 
       <Card className="rounded-[12px] border-white/10 bg-zinc-900/50">
         <CardHeader>
@@ -21,7 +24,8 @@ export default function SettingsPage() {
             <code className="text-[#22c55e]">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>,{" "}
             <code className="text-[#22c55e]">SUPABASE_SERVICE_ROLE_KEY</code>,{" "}
             <code className="text-[#22c55e]">ANTHROPIC_API_KEY</code>,{" "}
-            <code className="text-[#22c55e]">CRON_SECRET</code>.
+            <code className="text-[#22c55e]">CRON_SECRET</code>,{" "}
+            <code className="text-[#22c55e]">ADMIN_PASSWORD</code> (Passwort für „Jobs auslösen“ in dieser App).
           </p>
           <p>
             Lokale Entwicklung: <code className="rounded bg-zinc-950 px-1">.env.local</code> anlegen (siehe{" "}
