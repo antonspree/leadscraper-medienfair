@@ -25,26 +25,73 @@ function normalizeUrl(u: string): string {
   }
 }
 
+/** Keine Verzeichnisse, Portale, CDNs, Ads, Consent-Loader — nur echte Firmen-Webauftritte. */
+const BLOCKED_HOST_FRAGMENTS = [
+  "gelbeseiten.de",
+  "dasoertliche.de",
+  "cylex.de",
+  "yelp.de",
+  "facebook.com",
+  "instagram.com",
+  "google.com",
+  "linkedin.com",
+  "xing.com",
+  "google.de",
+  "wikipedia.org",
+  "youtube.com",
+  "consentmanager",
+  "cookiebot.com",
+  "onetrust.com",
+  "doubleclick.net",
+  "googlesyndication.com",
+  "googleadservices.com",
+  "pubads.g.doubleclick",
+  "pagead2.googlesyndication",
+  "amazon-adsystem.com",
+  "adnxs.com",
+  "outbrain.com",
+  "taboola.com",
+  "t-online.de",
+  "golocal.de",
+  "dastelefonbuch.de",
+  "telefonbuch.de",
+  "11880.de",
+  "11880.com",
+  "klicktel.de",
+  "dtme.de",
+  "h5v.eu",
+  "oertliche.h5v",
+  "whatsapp.com",
+  "wa.me",
+  "maps.google",
+  "gstatic.com",
+  "googleapis.com",
+  "schema.org",
+  "w3.org",
+  "twitter.com",
+  "x.com",
+  "pinterest.",
+  "tiktok.com",
+  "bing.com",
+  "yahoo.com",
+  "amazon.de",
+  "ebay.de",
+  "paypal.com",
+  "stripe.com",
+  "trustarc.com",
+  "usercentrics.eu",
+];
+
 export function isValidUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     if (!/^https?:$/i.test(parsed.protocol)) return false;
-    const blacklist = [
-      "gelbeseiten.de",
-      "dasoertliche.de",
-      "cylex.de",
-      "yelp.de",
-      "facebook.com",
-      "instagram.com",
-      "google.com",
-      "linkedin.com",
-      "xing.com",
-      "google.de",
-      "wikipedia.org",
-      "youtube.com",
-    ];
     const host = parsed.hostname.toLowerCase();
-    return !blacklist.some((b) => host.includes(b));
+    if (BLOCKED_HOST_FRAGMENTS.some((b) => host.includes(b))) return false;
+    if (host.split(".").length < 2) return false;
+    const path = parsed.pathname.toLowerCase();
+    if (path.includes("/delivery/cmp") || path.includes("consentmanager.net")) return false;
+    return true;
   } catch {
     return false;
   }
